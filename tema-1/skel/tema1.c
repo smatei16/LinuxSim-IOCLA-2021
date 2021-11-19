@@ -1,47 +1,11 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
-#define MAX_INPUT_LINE_SIZE 300
-
-struct Dir;
-struct File;
-
-typedef struct Dir{
-	char *name;
-	struct Dir* parent;
-	struct File* head_children_files;
-	struct Dir* head_children_dirs;
-	struct Dir* next;
-} Dir;
-
-typedef struct File {
-	char *name;
-	struct Dir* parent;
-	struct File* next;
-} File;
-
-void touch (Dir* parent, char* name) {}
-
-void mkdir (Dir* parent, char* name) {}
-
-void ls (Dir* parent) {}
-
-void rm (Dir* parent, char* name) {}
-
-void rmdir (Dir* parent, char* name) {}
-
-void cd(Dir** target, char *name) {}
-
-char *pwd (Dir* target) {}
-
-void stop (Dir* target) {}
-
-void tree (Dir* target, int level) {}
-
-void mv(Dir* parent, char *oldname, char *newname) {}
+#include "utils.h"
 
 int main () {
+
+	Dir *dir = calloc(1, sizeof(Dir));	
+	char* input = calloc(MAX_INPUT_LINE_SIZE, sizeof(char));
+	char* name = calloc(MAX_INPUT_LINE_SIZE, sizeof(char));
+
 	do
 	{
 		/*
@@ -49,7 +13,31 @@ int main () {
 			Reads from stdin a string and breaks it down into command and in
 			case it needs into a name.
 		*/
-	} while (/*condition*/);
+		scanf("%s", input);
+		
+		if(!strcmp(input, "touch"))
+		{
+			scanf("%s", name);
+			touch(dir, name);	
+		}
+
+		else if(!strcmp(input, "mkdir"))
+		{
+			scanf("%s", name);
+			mkdir(dir, name);
+		}
+
+		else if(!strcmp(input, "ls"))
+			ls(dir);
+		
+		
+
+		else if(!strcmp(input, "stop"))
+			break;
+
+	
+	} while (1);
+
 	
 	return 0;
 }
