@@ -32,7 +32,7 @@ int checkFile(Dir* parent, char* name)
     File* aux = parent->head_children_files;
     while(aux != NULL)
     {
-        if(strcmp(aux->name, name) == 0)
+        if(!strcmp(aux->name, name))
             return 1;
         aux = aux->next;
     }
@@ -45,7 +45,7 @@ int checkDir(Dir* parent, char* name)
     Dir* aux = parent->head_children_dirs;
     while(aux != NULL)
     {
-        if(strcmp(aux->name, name) == 0)
+        if(!strcmp(aux->name, name))
             return 1;
         aux = aux->next;
     }
@@ -113,7 +113,7 @@ void mkdir (Dir* parent, char* name)
 //implementeaza comanda ls
 void ls (Dir* parent)
 {
-    if(parent == 1) exit(1);
+    if(parent == NULL) exit(1);
 
     //afisez numele directoarelor
     Dir* auxDir = parent->head_children_dirs;
@@ -129,5 +129,140 @@ void ls (Dir* parent)
     {
         printf("%s\n", auxFile->name);
         auxFile = auxFile->next;
+    }
+}
+
+//implementeaza comanda rm
+void rm (Dir* parent, char* name)
+{
+    if(parent == NULL) exit(1);
+
+    //daca fisierul nu exista
+    if(!checkFile(parent, name))
+    {
+        printf("Could not find the file\n");
+    }
+
+    //daca fisierul exista
+    else
+    {
+        File* aux = parent->head_children_files;
+
+        //daca e primul fisier din lista
+        if(strcmp(aux->name, name) == 0)
+            parent->head_children_files = parent->head_children_files->next;
+        
+        //altfel il caut si il sterg
+        while(aux->next != NULL)
+        {
+            if(strcmp(aux->next->name, name) == 0)
+            {
+                File* temp = aux->next;
+                aux->next = aux->next->next;
+                free(temp->name);
+                free(temp);
+                break;
+            }
+            else aux = aux->next;
+        }
+    }
+    
+}
+
+//functie recursiva ajutatoare pentru rmdir
+void rmdirHelper(Dir* parent)
+{
+    //sterg toate fisierele
+    while(parent->head_children_files)
+        rm(parent, parent->head_children_files->name);
+    
+    //sterg toate folderele
+    while(parent->head_children_dirs)
+    {
+        Dir* temp = parent->head_children_dirs;
+        rmdirHelper(parent->head_children_dirs);
+        parent->head_children_dirs = parent->head_children_dirs->next;
+        free(temp->name);
+        free(temp);
+    }
+        
+}
+
+//implementeaza comanda rmdir
+void rmdir (Dir* parent, char* name)
+{
+    if(parent == NULL) exit(1);
+
+    //daca directorul nu exista
+    if(!checkDir(parent, name))
+    {
+        printf("Could not find the dir\n");
+    }
+
+    //daca directorul exista
+    else
+    {
+        Dir* aux = parent->head_children_dirs;
+
+        //daca e primul director din lista
+        if(!strcmp(aux->name, name))
+        {
+            parent->head_children_dirs = parent->head_children_dirs->next;
+            rmdirHelper(aux);
+        }
+
+        //altfel il caut si il sterg
+        while(aux->next != NULL)
+        {
+            if(!strcmp(aux->next->name, name))
+            {
+                Dir* temp = aux->next;
+                aux->next = aux->next->next;
+                rmdirHelper(temp);
+                break;
+            }
+
+            else aux = aux->next;
+        }
+    }
+}
+
+//implementeaza comanda cd
+void cd(Dir** target, char *name)
+{
+    if(target == NULL) exit(1);
+
+    if(!strcmp(name, ".."))
+    {
+        //daca are parinte
+        if((*target)->parent != NULL)
+            (*target) = (*target)->parent;
+        
+        //daca nu are parinte nu facem nimic
+    }
+
+    else
+    {
+        //daca directorul nu exista
+        if(!checkDir(*target, name))
+        {
+            printf("No directories found!\n");
+        }
+
+        //daca directorul exista schimbam directorul curent
+        else
+        {
+            Dir* aux = (*target)->head_children_dirs;
+
+            while(aux != NULL)
+            {
+                if(!strcmp(aux->name, name))
+                {
+                    (*target) = aux;
+                    break;
+                }
+                else aux = aux->next;
+            }
+        }
     }
 }
