@@ -29,6 +29,24 @@ int main () {
 
 		else if(!strcmp(input, "ls"))
 			ls(dir);
+
+		else if(!strcmp(input, "rm"))
+		{
+			scanf("%s", name);
+			rm(dir, name);
+		}
+
+		else if(!strcmp(input, "rmdir"))
+		{
+			scanf("%s", name);
+			rmdir(dir, name);
+		}
+
+		else if(!strcmp(input, "cd"))
+		{
+			scanf("%s", name);
+			cd(&dir, name);
+		}
 		
 		
 
