@@ -1,0 +1,31 @@
+//Staicu Matei 323CD
+1. touch
+Functia verifica daca exista un fisier/director cu acel nume (cu ajutorul functiilor auxiliare checkFile si checkDir) si daca nu exista, insereaza un fisier cu acel nume la coada listei de fisiere.
+
+2. mkdir
+Functia verifica daca exista un fisier/director cu acel nume (cu ajutorul functiilor auxiliare checkFile si checkDir) si daca nu exista, insereaza un director cu acel nume la coada listei de directoare.
+
+3. ls
+Parcurg toata lista de directoare din directorul parinte si afisez numele fiecaruia, iar apoi fac acelasi lucru pentru lista de fisiere.
+
+4. rm
+Verific daca fisierul cautat exista (cu checkFile), iar daca exista, parcurg lista pana la fisierul dinaintea fisierului cautat, schimb legatura next a acestuia cu fisierul de dupa el si eliberez memoria.
+
+5. rmdir
+Verific daca directorul cautat exista (cu checkDir), iar daca exista, parcurg lista pana la directorul dinaintea directorului cautat, schimb legatura next a acestuia, iar continutul il sterg cu ajutorul unei functii recursive (rmdirHelper).
+
+6. cd
+Verific mai intai cazul in care se schimba directorul curent cu directorul parinte (daca directorul parinte exista sau nu). In celalalt caz, verific daca directorul cautat exista, caz in care il caut si schimb referinta la target.
+
+7. tree
+Afisez mai intai lista de directoare, pentru fiecare director apeland recursiv functia tree pentru a afisa continutul directoarelor de pe urmatorul nivel. Apoi, la iesirea din recursivitate, afisez si lista de fisiere astfel incat sa fie afisate in ordinea corecta.
+
+8. pwd
+Merg in parintele fisierului/directorului curent pana cand ajung pe primul nivel si construiesc un mesaj dupa formatul cerut.
+
+9. stop
+Functia stop apeleaza functiile rm si rmdir pentru a sterge toate folderele si fisierele din ierarhie.
+
+10. mv
+Verific cazurile in care nu exista niciun fisier/director cu oldname sau daca exista un fisier sau un director cu newname si afisez mesajul specific. In cazul in care exista un fisier cu oldname, il caut, il sterg si adaug un fisier cu newname la coada listei.
+In cazul in care exista un director cu oldname, il caut, retin pointerii la fisierele si directoarele din acesta, il sterg si adaug un director nou la coada listei caruia ii fixez si pointerii pe care i-am retinut mai devreme.

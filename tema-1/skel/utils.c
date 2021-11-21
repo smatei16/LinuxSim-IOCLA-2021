@@ -150,10 +150,16 @@ void rm (Dir* parent, char* name)
 
         //daca e primul fisier din lista
         if(strcmp(aux->name, name) == 0)
+        {
+            File* temp = parent->head_children_files;
             parent->head_children_files = parent->head_children_files->next;
+            free(temp->name);
+            free(temp);
+        }
+            
         
         //altfel il caut si il sterg
-        while(aux->next != NULL)
+        else while(aux->next != NULL)
         {
             if(strcmp(aux->next->name, name) == 0)
             {
@@ -209,19 +215,22 @@ void rmdir (Dir* parent, char* name)
         {
             parent->head_children_dirs = parent->head_children_dirs->next;
             rmdirHelper(aux);
+            free(aux->name);
+            free(aux);
         }
 
         //altfel il caut si il sterg
-        while(aux->next != NULL)
+        else while(aux->next != NULL)
         {
             if(!strcmp(aux->next->name, name))
             {
                 Dir* temp = aux->next;
                 aux->next = aux->next->next;
                 rmdirHelper(temp);
+                free(temp->name);
+                free(temp);
                 break;
             }
-
             else aux = aux->next;
         }
     }
@@ -263,6 +272,133 @@ void cd(Dir** target, char *name)
                 }
                 else aux = aux->next;
             }
+        }
+    }
+}
+
+//implementeaza comanda tree
+void tree (Dir* target, int level)
+{
+    //iau mai intai directoarele
+    Dir* aux = target->head_children_dirs;
+    char* message = calloc(MAX_INPUT_LINE_SIZE, sizeof(char));
+
+    while(aux)
+    {
+        //construiesc outputul dupa formatul cerut
+        for(int i = 0; i < 4 * level; i++)
+            strcat(message, " ");
+        strcat(message, aux->name);
+        printf("%s\n", message);
+        memset(message, 0, strlen(message));
+
+        //iau directoarele de pe urmatorul nivel
+        tree(aux, level + 1);
+        
+        //afisez si fisierele
+        File* aux2 = aux->parent->head_children_files;
+        while(aux2)
+        {
+            for(int i = 0; i < 4 * level; i++)
+                strcat(message, " ");
+            strcat(message, aux2->name);
+            printf("%s\n", message);
+            memset(message, 0, strlen(message));
+            aux2 = aux2->next;
+        }
+        aux = aux->next;
+    }
+    free(message);
+}
+
+//implementeaza comanda pwd
+char *pwd (Dir* target)
+{
+    char* message = calloc(MAX_INPUT_LINE_SIZE, sizeof(char));
+    Dir* aux = target;
+
+    //merg in parintele fisierului/directorului cat timp acesta exista si contruiesc mesajul
+    while(aux)
+    {
+        char* temp = strdup(message);
+        memset(message, 0, strlen(message));
+        strcpy(message, "/");
+        strcat(message, aux->name);
+        strcat(message, temp);
+        aux = aux->parent;
+        free(temp);
+    }
+    return message;
+}
+
+//implementeaza comanda stop
+void stop (Dir* target)
+{
+    //golesc lista de directoare
+    while(target->head_children_dirs)
+        rmdir(target, target->head_children_dirs->name);
+
+    //golesc lista de fisiere
+    while(target->head_children_files)
+        rm(target, target->head_children_files->name);
+    
+    //eliberez memoria
+    free(target->name);
+    free(target);
+}
+
+//implementeaza comanda mv
+void mv(Dir* parent, char *oldname, char *newname)
+{
+    if(parent == NULL) exit(1);
+
+    //daca nu exista niciun fisier sau director cu oldname
+    if(!checkFile(parent, oldname) && !checkDir(parent, oldname))
+        printf("File/Director not found\n");
+    
+    //daca exista un fisier sau un director cu newname
+    else if(checkFile(parent, newname) || checkDir(parent, newname))
+        printf("File/Director already exists\n");
+
+    //daca exista un fisier cu oldname
+    else if(checkFile(parent, oldname))
+    {
+        rm(parent, oldname);
+        touch(parent, newname);
+    }
+
+    //daca exista un director cu oldname
+    else if(checkDir(parent, oldname))
+    {
+        Dir* aux = parent->head_children_dirs;
+        Dir *newDir = createDir(parent, newname);
+
+        //caut directorul cu oldname si retin fisierele si directoarele din el
+        while(aux)
+        {
+            if(!strcmp(aux->name, oldname))
+            {
+                newDir->head_children_dirs = aux->head_children_dirs;
+                newDir->head_children_files = newDir->head_children_files;
+                break;
+            }
+        }
+
+        //sterg directorul vechi
+        rmdir(parent, oldname);
+
+        //adaug directorul nou la finalul listei
+
+        //daca nu mai ramane niciun director dupa stergerea celui vechi
+        if(parent->head_children_dirs == NULL)
+            parent->head_children_dirs = newDir;
+
+        //altfel parcurg lista si il inserez la sfarsit
+        else
+        {
+            aux = parent->head_children_dirs;
+            while(aux->next != NULL) aux = aux->next;
+            aux->next = newDir;
         }
     }
 }
