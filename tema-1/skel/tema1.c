@@ -2,17 +2,13 @@
 
 int main () {
 
-	Dir *dir = calloc(1, sizeof(Dir));	
+	Dir *dir = createDir(NULL, "home");
+	Dir *root = dir;
 	char* input = calloc(MAX_INPUT_LINE_SIZE, sizeof(char));
 	char* name = calloc(MAX_INPUT_LINE_SIZE, sizeof(char));
 
 	do
 	{
-		/*
-		Summary:
-			Reads from stdin a string and breaks it down into command and in
-			case it needs into a name.
-		*/
 		scanf("%s", input);
 		
 		if(!strcmp(input, "touch"))
@@ -47,14 +43,36 @@ int main () {
 			scanf("%s", name);
 			cd(&dir, name);
 		}
-		
-		
 
+		else if(!strcmp(input, "tree"))
+			tree(dir, 0);
+
+		else if(!strcmp(input, "pwd"))
+		{
+			char *message = pwd(dir);
+			printf("%s\n", message);
+			free(message);
+		}
+
+		else if(!strcmp(input, "mv"))
+		{
+			scanf("%s", name);
+			char* name2 = calloc(MAX_INPUT_LINE_SIZE, sizeof(char));
+			scanf("%s", name2);
+			mv(dir, name, name2);
+			free(name2);
+		}
+		
 		else if(!strcmp(input, "stop"))
+		{
+			stop(root);
 			break;
-
+		}
 	
 	} while (1);
+
+	free(input);
+	free(name);
 
 	
 	return 0;

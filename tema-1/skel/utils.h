@@ -27,6 +27,9 @@ typedef struct File {
 	struct File* next;
 } File;
 
+File* createFile(Dir* parent, char* name);
+
+Dir* createDir(Dir* parent, char* name);
 
 void touch (Dir* parent, char* name);
 
